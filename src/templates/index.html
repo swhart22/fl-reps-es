@@ -1,0 +1,299 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title><%= htmlWebpackPlugin.options.title %></title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css"
+   integrity="sha512-M2wvCLH6DSRazYeZRIm1JnYyh22purTM+FDB5CsyxtQJYeKq83arPe5wgbNmcFXGqiSH2XR8dT/fJISVA1r/zQ=="
+   crossorigin=""/>
+   <script src="https://data.nbcstations.com/js/crosstalk.js"></script>
+    <script type="text/javascript">
+         document.addEventListener("DOMContentLoaded", function() {
+            xtalk.responsive = false;
+            xtalk.init();
+         });
+    </script>
+  </head>
+
+  <body>
+    <style>
+      *{
+        box-sizing:border-box;
+      }
+      a{
+        color:#1259a6;
+        text-decoration:none;
+
+      }
+      p, li, table{
+        font-family: 'Arimo', sans-serif;
+        font-size: 12px;
+        color: #333;
+      }
+      tr:nth-child(even) {background-color: #f2f2f2;}
+      tr.challenged{
+        background-color:#FAF0CD;
+      }
+      tr.removed, tr.withdrawn{
+        background-color:#F3D0CA;
+      }
+      tr:nth-child(2){
+        font-weight:700;
+      }
+      #container{
+        width:620px;
+        position:relative;
+        margin-left:auto;
+        margin-right:auto;
+      }
+      #map-and-results{
+        display:flex;
+        
+      }
+      #leaflet-map{
+        width:500px;
+        height:500px;
+        display:none;
+        /*border-radius:250px;*/
+      }
+      #find-ward{
+        width:100%;
+      }
+
+      #search-group{
+        /*background-color:#D2E8F5;*/
+        margin-bottom:10px;
+        padding:3px 0px;
+        width:100%;
+        margin-left:auto;
+        margin-right:auto;
+      }
+      #enter-ward-text{
+        font-weight:300;
+        font-family:'Roboto',sans-serif;
+        font-size:20px;
+      }
+      #ward-input{
+        width:100%;
+      }
+      #blurb{
+
+      }
+      #blurb p{
+        font-size:15px;
+      }
+      #clip{
+        font-weight:800;
+      }
+      #ward-error{
+        font-family:'Arimo', sans-serif;
+        font-style:italic;
+      }
+      #example{
+        font-family:'Arimo', sans-serif;
+        color:#807F7F;
+        font-size:12px;
+        margin-top:7px;
+      }
+      .dist-name{
+        font-family:'Roboto',sans-serif;
+        font-weight:800;
+        font-size:20px;
+        margin-top:3px;
+        margin-bottom:3px;
+      }
+      .pol-icon{
+        width:100px;
+        height:100px;
+        border-width:4px;
+        border-style:solid;
+        border-radius:50px;
+        margin-right:10px;
+        background-size:100%;
+      }
+      .icon-text{
+        display:flex;
+      }
+      #ward-results{
+        display:flex;
+      }
+      .house-rep{
+        width:50%;
+        display:flex;
+        /*justify-content:space-between;*/
+      }
+      .office-signifier{
+        text-transform:uppercase;
+        font-family:'Roboto', sans-serif;
+        font-weight:300;
+        margin-top:0;
+      }
+      #turnout, #exit{
+        font-size:13px;
+      }
+      #cand-table{
+        width:100%;
+        border-collapse:collapse;
+      }
+      #cand-table td, #cand-table th{
+        padding-top:10px;
+        padding-bottom:10px;
+        padding-left:10px;
+        font-size:13px;
+        text-align:left;
+      }
+      #current-alderman{
+        font-size:15px;
+      }
+      #ward-submit{
+        padding:10px;
+        border-radius:5px;
+        font-family:'Roboto',sans-serif;
+        font-weight:300;
+        color:#fff;
+        background-color:#1259a6;
+        cursor:pointer;
+        font-size:15px;
+      }
+      /*bootstrap shizz*/
+                .form-control {
+                    display: block;
+                    width: 100%;
+                    padding: 0.5rem 0.75rem;
+                    font-size: 1rem;
+                    line-height: 1.25;
+                    color: #464a4c;
+                    background-color: #fff;
+                    background-image: none;
+                    -webkit-background-clip: padding-box;
+                            background-clip: padding-box;
+                    border: 1px solid rgba(0, 0, 0, 0.15);
+                    border-radius: 0.25rem;
+                    -webkit-transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+                    transition: border-color ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+                    -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+                    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
+                    transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s, -webkit-box-shadow ease-in-out 0.15s;
+                  }
+
+                  .form-control::-ms-expand {
+                    background-color: transparent;
+                    border: 0;
+                  }
+
+                  .form-control:focus {
+                    color: #464a4c;
+                    background-color: #fff;
+                    border-color: #5cb3fd;
+                    outline: none;
+                  }
+
+                  .form-control::-webkit-input-placeholder {
+                    color: #636c72;
+                    opacity: 1;
+                  }
+
+                  .form-control::-moz-placeholder {
+                    color: #636c72;
+                    opacity: 1;
+                  }
+
+                  .form-control:-ms-input-placeholder {
+                    color: #636c72;
+                    opacity: 1;
+                  }
+
+                  .form-control::placeholder {
+                    color: #636c72;
+                    opacity: 1;
+                  }
+
+                  .form-control:disabled, .form-control[readonly] {
+                    background-color: #eceeef;
+                    opacity: 1;
+                  }
+
+                  .form-control:disabled {
+                    cursor: not-allowed;
+                  }
+
+
+        /*620px*/
+
+        @media only screen and (max-width: 730px) {
+         #container{
+          width:100%;
+         }
+         #search-group{
+            width:100%;
+            padding:3px 0px;
+          }
+         #leaflet-map{
+            width:300px;
+            height:300px;
+            /*border-radius:150px;*/
+          }
+          .dist-name{
+            font-size:25px;
+          }
+          #cand-table td, #cand-table th{
+
+            font-size:13px;
+            text-align:left;
+          }
+          #current-alderman{
+
+            font-size:13px;
+          }
+          #find-ward{
+            width:45%;
+            height:300px;
+          }
+
+        }
+        /*mobile*/
+        @media only screen and (max-width: 400px) {
+          #search-group{
+            width:100%;
+            padding:3px 15px;
+          }
+          #find-ward{
+            width:100%;
+            padding:3px 15px;
+          }
+          #map-and-results{
+            flex-wrap:wrap-reverse;
+          }
+        }
+
+    </style>
+    <div id="xtalk" class="parent" style="width:100%; padding-bottom:35px; overflow:auto">
+      <div id="container">
+        <div id="search-group">
+              <p id='enter-ward-text'>Escriba una dirección o lugar del área de Miami para encontrar a sus representantes estatales</p>
+              <input id="ward-input" type="text" class="form-control" placeholder="100 SE 2nd St, Miami, FL 33131" aria-describedby="sizing-addon2"></input>
+              <div id="example">por ejemplo: "100 SE 2nd St, Miami, FL 33131", "Miami-Dade International Airport", "Key West, FL"<br /><br />
+                <span id="android-warning"></span>
+              </div>
+              <div id="ward-error"></div>
+              <button id="ward-submit">Busque</button><br />
+        </div>
+        <div id="map-and-results">
+          <div id="find-ward">
+              <div id="ward-results"></div>
+              
+              
+
+          </div>
+          <div id="leaflet-map">
+          </div>
+        </div>
+        
+
+      </div>
+    </div>
+
+  </body>
+</html>
